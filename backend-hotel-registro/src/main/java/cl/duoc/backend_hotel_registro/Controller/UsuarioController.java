@@ -50,6 +50,16 @@ private final UsuarioService usuarioService;
         Usuariodto creado = usuarioService.registrarNuevoUsuario(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
+    @PostMapping("/enviar-compañero")
+    public ResponseEntity<String> enviarAlCompañero(@RequestBody Usuariodto dto) {
+        try {
+            usuarioService.procesarYEnviarCliente(dto);
+            return ResponseEntity.ok("¡Datos mapeados y despachados hacia la AWS de tu compañero con éxito!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al conectar con el servidor externo: " + e.getMessage());
+        }
+    }
 
   
     @PutMapping("/actualizar/{rut}")

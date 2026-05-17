@@ -1,9 +1,11 @@
 package cl.duoc.backend_hotel_registro.Service;
 import cl.duoc.backend_hotel_registro.Model.Usuario;
 import cl.duoc.backend_hotel_registro.Repository.UsuarioRepository;
+import cl.duoc.backend_hotel_registro.client.HotelClient;
 import cl.duoc.backend_hotel_registro.dto.UsuarioCreateDTO;
 import cl.duoc.backend_hotel_registro.dto.Usuariodto;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -18,7 +20,18 @@ public class UsuarioService {
         public Optional<Usuario> findByRut(String rut) {
             return usuarioRepository.findByRut(rut);
 }
-
+@Autowired
+    private HotelClient hotelClient;
+    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
+        public void procesarYEnviarCliente(Usuariodto dto) {
+        log.info("Procesando cliente localmente: {}", dto.getNombreCompleto());
+        
+        // Aquí harías tu lógica local (guardar en tu BD de clientes si es necesario)
+        
+        log.info("Enviando datos a la AWS del servicio de hoteles...");
+        hotelClient.enviarClienteAHotel(dto);
+        log.info("¡Datos enviados con éxito!");
+    }
 
     
  public Usuariodto findDtoByRut(String rut) {

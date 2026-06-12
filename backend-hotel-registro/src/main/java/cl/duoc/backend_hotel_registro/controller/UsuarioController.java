@@ -1,6 +1,6 @@
-package cl.duoc.backend_hotel_registro.Controller;
-import cl.duoc.backend_hotel_registro.Model.Usuario;
-import cl.duoc.backend_hotel_registro.Service.UsuarioService;
+package cl.duoc.backend_hotel_registro.controller;
+import cl.duoc.backend_hotel_registro.model.Usuario;
+import cl.duoc.backend_hotel_registro.service.UsuarioService;
 import jakarta.validation.Valid;
 import cl.duoc.backend_hotel_registro.dto.UsuarioCreateDTO;
 import org.springframework.http.HttpStatus;
@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-
+@Tag(name = "Usuarios", description = "Operaciones de gestión de usuarios")
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
@@ -29,7 +33,11 @@ private final UsuarioService usuarioService;
         this.usuarioService = usuarioService;
     }
 
-   
+   @Operation(summary = "Obtener usuario por RUT", description = "Busca un usuario registrado utilizando su RUT único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario encontrado y retornado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado con el RUT proporcionado")
+    })
     @GetMapping("/{rut}")
     public ResponseEntity<?> getUsuario(@PathVariable String rut) {
         Usuariodto dto = usuarioService.findDtoByRut(rut);
@@ -39,17 +47,29 @@ private final UsuarioService usuarioService;
         return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
     }
 
-   
+   @Operation(summary = "Listar todos los usuarios", description = "Obtiene una lista de todos los usuarios registrados")
+    @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente")
     @GetMapping
     public ResponseEntity<List<Usuario>> listarUsuarios() {
         return new ResponseEntity<>(usuarioService.obtenerTodos(), HttpStatus.OK);
     }
 
+    @Operation(summary = "Registrar nuevo usuario", description = "Crea un nuevo usuario con los datos proporcionados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos o usuario con RUT ya existente")
+    })
     @PostMapping("/registrar")
     public ResponseEntity<Usuariodto> crearUsuario(@Valid @RequestBody UsuarioCreateDTO dto) {
         Usuariodto creado = usuarioService.registrarNuevoUsuario(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
+
+    @Operation(summary = "Enviar datos a compañero", description = "Envía los datos del usuario hacia la AWS de tu compañero")  
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Datos enviados exitosamente a la AWS del compañero"),
+        @ApiResponse(responseCode = "500", description = "Error al conectar con el servidor externo o procesar los datos")
+    })
     @PostMapping("/enviar-compañero")
     public ResponseEntity<String> enviarAlCompañero(@RequestBody Usuariodto dto) {
         try {
@@ -61,7 +81,12 @@ private final UsuarioService usuarioService;
         }
     }
 
-  
+    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario existente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario actualizado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado con el RUT proporcionado"),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos")
+    })
     @PutMapping("/actualizar/{rut}")
     public ResponseEntity<?> actualizarUsuario(@PathVariable String rut, @Valid @RequestBody Usuario usuarioData) {
         try {
@@ -76,7 +101,11 @@ private final UsuarioService usuarioService;
         }
     }
 
-   
+    @Operation(summary = "Eliminar usuario", description = "Elimina un usuario registrado utilizando su RUT único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado con el RUT proporcionado")
+    })
     @DeleteMapping("/{rut}")
     public ResponseEntity<String> eliminarUsuario(@PathVariable String rut) {
         boolean eliminado = usuarioService.eliminarPorRut(rut);

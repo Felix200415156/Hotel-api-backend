@@ -1,4 +1,4 @@
-package cl.duoc.backend_hotel_registro.Model;
+package cl.duoc.backend_hotel_registro.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;

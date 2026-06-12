@@ -1,10 +1,9 @@
-package cl.duoc.backend_hotel_registro.Repository;
-import cl.duoc.backend_hotel_registro.Model.Usuario;
-
-
+package cl.duoc.backend_hotel_registro.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+
 import org.springframework.transaction.annotation.Transactional;
+
+import cl.duoc.backend_hotel_registro.model.Usuario;
 
 import java.util.Optional;
 
@@ -12,7 +11,7 @@ import java.util.Optional;
 
 
 
-@Repository
+
 public interface UsuarioRepository extends JpaRepository<Usuario,Long>{
 
     Optional<Usuario>findByGmail(String gmail);

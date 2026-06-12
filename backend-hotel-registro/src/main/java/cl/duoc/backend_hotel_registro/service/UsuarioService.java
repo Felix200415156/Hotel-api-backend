@@ -1,9 +1,11 @@
-package cl.duoc.backend_hotel_registro.Service;
-import cl.duoc.backend_hotel_registro.Model.Usuario;
-import cl.duoc.backend_hotel_registro.Repository.UsuarioRepository;
-import cl.duoc.backend_hotel_registro.client.HotelClient;
+package cl.duoc.backend_hotel_registro.service;
+import cl.duoc.backend_hotel_registro.client.HabitacionesClient;
+
 import cl.duoc.backend_hotel_registro.dto.UsuarioCreateDTO;
 import cl.duoc.backend_hotel_registro.dto.Usuariodto;
+import cl.duoc.backend_hotel_registro.model.Usuario;
+import cl.duoc.backend_hotel_registro.repository.UsuarioRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +22,16 @@ public class UsuarioService {
         public Optional<Usuario> findByRut(String rut) {
             return usuarioRepository.findByRut(rut);
 }
-@Autowired
-    private HotelClient hotelClient;
+
+    private HabitacionesClient hotelClient;
     private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
         public void procesarYEnviarCliente(Usuariodto dto) {
         log.info("Procesando cliente localmente: {}", dto.getNombreCompleto());
         
-        // Aquí harías tu lógica local (guardar en tu BD de clientes si es necesario)
+
         
         log.info("Enviando datos a la AWS del servicio de hoteles...");
-        hotelClient.enviarClienteAHotel(dto);
+        hotelClient.getHabitacion(dto.getId());
         log.info("¡Datos enviados con éxito!");
     }
 
@@ -48,7 +50,7 @@ public class UsuarioService {
     }).orElse(null);
     }
 public Usuariodto registrarNuevoUsuario(UsuarioCreateDTO dto) {
-    // 1. Creamos la entidad para guardar en la DB
+  
     Usuario usuario = new Usuario();
     usuario.setRut(dto.getRut());
     usuario.setNombreCompleto(dto.getNombreCompleto());
@@ -56,10 +58,10 @@ public Usuariodto registrarNuevoUsuario(UsuarioCreateDTO dto) {
     usuario.setTelefono(dto.getTelefono());
     usuario.setContraseña(dto.getContraseña());
 
-    // 2. Guardamos
+ 
     Usuario guardado = usuarioRepository.save(usuario);
 
-    // 3. Retornamos el DTO (usando el constructor AllArgsConstructor que creaste)
+
     return new Usuariodto(
         guardado.getId(),
         guardado.getRut(),
